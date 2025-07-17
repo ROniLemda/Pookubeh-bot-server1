@@ -75,11 +75,15 @@ async function executeFunction(name, args) {
 }
 
 app.post('/chat', async (req, res) => {
-  console.log('POST /chat', req.body); // Debug log for incoming requests
+  console.log('POST /chat', req.body);
+  if (!req.body || !req.body.message) {
+    console.error('Missing body or message:', req.body);
+    return res.status(400).json({ error: 'Missing message' });
+  }
   const userMessage = req.body.message;
-  if (!userMessage) return res.status(400).json({ error: 'Missing message' });
 
   try {
+    console.log('Calling OpenAI...');
     const completion = await openai.chat.completions.create({
       model: 'gpt-4-1106-preview',
       messages: [
@@ -90,20 +94,20 @@ app.post('/chat', async (req, res) => {
       function_call: 'auto',
       temperature: 0.3
     });
+    console.log('OpenAI response:', completion);
 
     const response = completion.choices[0].message;
     if (response.function_call) {
-      // הבוט ביקש להפעיל פונקציה
       const { name, arguments: argsStr } = response.function_call;
       let args = {};
-      try { args = JSON.parse(argsStr); } catch (e) {}
+      try { args = JSON.parse(argsStr); } catch (e) { console.error('Failed to parse function args:', argsStr); }
       const result = await executeFunction(name, args);
       return res.json({ reply: result, function: name, args });
     } else {
-      // תשובה רגילה
       return res.json({ reply: response.content });
     }
   } catch (err) {
+    console.error('Error in /chat:', err);
     return res.status(500).json({ error: 'שגיאה בשרת', details: err.message });
   }
 });
