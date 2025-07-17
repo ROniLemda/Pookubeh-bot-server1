@@ -85,7 +85,7 @@ app.post('/chat', async (req, res) => {
   try {
     console.log('Calling OpenAI...');
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4-1106-preview',
+      model: 'gpt-3.5-turbo',
       messages: [
         { role: 'system', content: 'אתה בוט ניהול חכם של מערכת מסעדה. ענה תמיד בעברית, בלשון זכר, ובצורה עניינית. אם יש צורך בפעולה, השתמש בפונקציות.' },
         { role: 'user', content: userMessage }
