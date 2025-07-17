@@ -11,7 +11,7 @@ app.use(cors({
 app.use(express.json());
 
 const openai = new OpenAI({
-  apiKey: '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',
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 // הגדרת פונקציות שהבוט יכול "להפעיל"
